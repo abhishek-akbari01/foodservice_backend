@@ -5,8 +5,10 @@ const mongoose = require("mongoose");
 const dbUrl = process.env.MONGODB_URL;
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const path = require("path");
 
 const userRoutes = require("./routes/userRoutes");
+const foodRoutes = require("./routes/foodRoutes");
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -36,12 +38,14 @@ mongoose
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "uploads")));
 
 app.get("/", (req, res) => {
   res.send("Hello world");
 });
 
 app.use("/api", userRoutes);
+app.use("/api", foodRoutes);
 
 app.listen(port, () => {
   console.log("App is running!!");

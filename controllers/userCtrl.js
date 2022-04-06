@@ -66,6 +66,7 @@ exports.signin = async (req, res) => {
     msg: "signIn success",
     id: user._id,
     username: user.username,
+    role: user.role,
   });
 };
 

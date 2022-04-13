@@ -14,6 +14,12 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    addCart: {
+      type: Array,
+    },
+    order: {
+      type: Array,
+    },
   },
   { timestamps: true }
 );

@@ -14,9 +14,17 @@ const foodSchema = new mongoose.Schema(
       type: String,
       contentType: String,
     },
+    price: {
+      type: Number,
+      required: true,
+    },
     category: {
       type: Number,
       required: true,
+    },
+    orderStatus: {
+      type: Boolean,
+      default: 0,
     },
   },
   { timestamps: true }

@@ -107,8 +107,48 @@ exports.createOrder = (req, res) => {
 };
 
 exports.getAllOrder = (req, res) => {
-  Order.find({}, (err, orders) => {
+  User.find({}, { order: 1, username: 1 }, (err, users) => {
     if (err) return res.status(400).json({ err: "Something went wrong" });
-    res.json({ orders });
+    // console.log("users type", users[0]);
+    // const newusers = users.map((v) => {
+    // console.log(
+    //   v.order.filter((o) => {
+    //     // console.log(o.orderStatus);
+    //     return o.orderStatus == false;
+    //   })
+    // );
+    // console.log(
+    //   "v.order.filter((o) => o.orderStatus)",
+    //   v.order.filter((o) => o.orderStatus == true)
+    // );
+    //   return {
+    //     ...v,
+    //     order: v.order.filter((o) => {
+    //       o.orderStatus == false;
+    //     }),
+    //   };
+    // });
+    // console.log("newusers", newusers);
+    res.json(users);
+  });
+};
+
+exports.confirmOrder = (req, res) => {
+  const userId = req.params.userId;
+  const orderId = req.params.orderId;
+
+  User.updateOne(
+    { _id: userId, "order._id": orderId },
+    {
+      $set: {
+        "order.$.orderStatus": true,
+      },
+    },
+    {
+      new: true,
+    }
+  ).exec((err, user) => {
+    if (err) return res.status(400).json({ err: "Something went wrong" });
+    res.json(user);
   });
 };

@@ -13,6 +13,9 @@ const {
   isAuthenticated,
   isSignedIn,
   confirmOrder,
+  recentOrder,
+  getAllOrderCount,
+  getUserExpense,
 } = require("../controllers/userCtrl");
 const router = express.Router();
 
@@ -26,5 +29,8 @@ router.put("/admin/confirmOrder/:userId/:orderId", confirmOrder);
 router.post("/admin/createProduct", createProduct);
 router.put("/admin/updateProduct/:productId", updateProduct);
 router.delete("/admin/deleteProduct/:productId", deleteProduct);
+router.get("/recentOrder/:id", recentOrder);
+router.get("/admin/getOrderCount", getAllOrderCount);
+router.get("/getUserExpense/:id", getUserExpense);
 
 module.exports = router;

@@ -7,6 +7,9 @@ const bcrypt = require("bcrypt");
 const User = require("../models/user");
 const Order = require("../models/order");
 
+const mongoose = require("mongoose");
+const res = require("express/lib/response");
+
 exports.getUserById = (req, res, next, id) => {
   User.findById(id).exec((err, user) => {
     if (err || !user) {
@@ -150,5 +153,76 @@ exports.confirmOrder = (req, res) => {
   ).exec((err, user) => {
     if (err) return res.status(400).json({ err: "Something went wrong" });
     res.json(user);
+  });
+};
+
+exports.recentOrder = (req, res) => {
+  const userId = req.params.id;
+  console.log(userId);
+
+  User.aggregate([
+    { $match: { _id: mongoose.Types.ObjectId(userId) } },
+    { $unwind: { path: "$order" } },
+    { $sort: { "order.createdAt": -1 } },
+    { $limit: 3 },
+    {
+      $group: {
+        _id: "$_id",
+        data: {
+          $push: {
+            item: "$order.item",
+            date: "$order.createdAt",
+            title: "$order.title",
+            description: "$order.description",
+            photo: "$order.photo",
+            price: "$order.price",
+          },
+        },
+      },
+    },
+  ]).exec((err, list) => {
+    if (err) return res.status(400).json({ err: "Something went wrong" });
+    res.json({ list });
+  });
+
+  // User.find(
+  //   { _id: userId },
+  //   { order: 1 },
+  //   { $orderby: { "order.$.createdAt": -1 } }
+  // ).exec((err, list) => {
+  //   if (err) return res.status(400).json({ err: "Something went wrong" });
+  //   res.json(list);
+  // });
+};
+
+exports.getAllOrderCount = async (req, res) => {
+  let orderCount = 0;
+  let totalMoney = 0;
+  User.find({}, { order: 1 }).exec((err, users) => {
+    if (err) return res.status(400).json({ err: "Somthing went wrong" });
+    users.map((user) => {
+      user.order.map((ord) => {
+        orderCount = orderCount + 1;
+        totalMoney = totalMoney + ord.price;
+      });
+    });
+    res.json({ orderCount, totalMoney });
+  });
+};
+
+exports.getUserExpense = async (req, res) => {
+  const userId = req.params.id;
+  let orderCount = 0;
+  let totalMoney = 0;
+  User.find({ _id: userId }, { order: 1 }).exec((err, user) => {
+    if (err) return res.status(400).json({ err: "Somthing went wrong" });
+
+    // console.log({ user });
+    user[0].order.map((ord) => {
+      orderCount = orderCount + 1;
+      totalMoney = totalMoney + ord.price;
+    });
+
+    res.json({ orderCount, totalMoney });
   });
 };
